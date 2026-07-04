@@ -1,0 +1,253 @@
+/* fausto.ge — faithful static replica of the WordPress "Pub" theme
+   Design tokens extracted from the live site:
+   fonts  Figtree (body/headings), Literata (site title), IBM Plex Mono (tagline)
+   colors primary #0d0f12  secondary #005ae1  foreground #474747
+          background #ffffff  tertiary #f7f9fd
+   layout 620px content column, line-height 1.6                          */
+
+:root {
+  --primary:    #0d0f12;
+  --secondary:  #005ae1;
+  --foreground: #474747;
+  --background: #ffffff;
+  --tertiary:   #f7f9fd;
+  --content:    620px;
+  --sans:  "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono:  "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.container {
+  max-width: var(--content);
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+}
+
+a { color: var(--secondary); text-decoration: none; }
+a:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---------- Header ---------- */
+.site-header { margin-bottom: 3rem; }
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+.site-nav a { color: var(--primary); }
+.site-nav a:hover { color: var(--secondary); text-decoration: none; }
+.site-nav a[aria-current="page"] { text-decoration: underline; text-underline-offset: 3px; }
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  margin: 0 0 0.35rem;
+}
+.site-title {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 1.7rem;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+.site-title a { color: var(--primary); }
+.site-title a:hover { color: var(--foreground); text-decoration: none; }
+
+.site-tagline {
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  color: var(--foreground);
+  margin: 0 0 1rem;
+}
+/* the quirk: a terminal cursor that blinks a few times, then signs off */
+.site-tagline::after {
+  content: "\258B";           /* ▋ */
+  margin-left: 0.15em;
+  color: var(--secondary);
+  opacity: 0;
+  animation: blinkout 4.4s steps(1) forwards;
+}
+@keyframes blinkout {
+  0%, 25%, 50%, 75%       { opacity: 1; }
+  12.5%, 37.5%, 62.5%, 87.5%, 100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-tagline::after { animation: none; opacity: 0; }
+}
+
+.social { display: flex; gap: 0.85rem; align-items: center; margin-left: auto; }
+.social a { color: var(--primary); display: inline-flex; }
+.social a:hover { color: var(--secondary); }
+.social svg { width: 22px; height: 22px; display: block; fill: currentColor; }
+
+/* ---------- Headings ---------- */
+h1.page-title {
+  font-family: var(--sans);
+  font-weight: 700;
+  color: var(--primary);
+  font-size: clamp(1.9rem, 1.6rem + 1.5vw, 2.6rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0 0 2rem;
+}
+h2.section-title {
+  font-family: var(--sans);
+  font-weight: 700;
+  color: var(--primary);
+  font-size: clamp(1.5rem, 1.35rem + 0.8vw, 1.95rem);
+  line-height: 1.2;
+  margin: 3rem 0 1.5rem;
+}
+
+/* ---------- Post list (home) — thick black framed postcards ---------- */
+.posts { display: flex; flex-direction: column; gap: 2.25rem; }
+
+.post {
+  background: #fff;
+  border: 2px solid var(--primary);   /* squared black frame */
+  border-radius: 0;
+  padding: 26px 26px 22px;            /* wide white mat around the picture */
+  transition: border-color 0.15s ease;
+}
+.post:hover { border-color: var(--secondary); }
+
+.post-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1200 / 630;
+  object-fit: cover;
+  margin: 0;
+  border-radius: 0;
+  border: 1px solid rgba(13, 15, 18, 0.28);  /* subtle dark grey line around the pic */
+  background: var(--tertiary);
+}
+
+.post-body { padding: 0.95rem 0 0; }
+
+.post-date {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: #6b7280;
+  margin: 0 0 0.55rem;
+}
+.post-title {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 1.3rem;
+  line-height: 1.25;
+  margin: 0 0 0.6rem;
+}
+.post-title a { color: var(--primary); }
+.post-title a:hover { color: var(--secondary); text-decoration: none; }
+
+/* Automated preview: paste the full opening text — CSS clips it to 3 lines
+   and adds the ellipsis. No manual truncation needed. */
+.post-excerpt {
+  margin: 0 0 0.75rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+.byline { font-size: 0.9rem; color: #6b7280; margin: 0; }
+
+/* ---------- Prose (about) ---------- */
+.prose p { margin: 0 0 1.25rem; }
+.prose { font-size: 1.06rem; }
+
+.about-photo {
+  display: block;
+  width: 100%;
+  margin: 0 auto 2rem;
+  border: 2px solid var(--primary);   /* same frame as the research gif */
+  padding: 18px;                      /* white mat */
+  background: #fff;
+}
+
+/* ---------- Research ---------- */
+.research-hero {
+  border: 2px solid var(--primary);
+  background: #fff;
+  padding: 18px;
+  margin: 0 0 2.5rem;
+}
+.research-hero img { display: block; width: 100%; height: auto; }
+
+.paper { margin: 0 0 2.25rem; }
+.paper .cite { color: var(--primary); font-weight: 500; margin: 0 0 0.55rem; }
+.paper .cite em { font-style: italic; }
+.paper .award {
+  font-size: 0.88rem;
+  font-style: italic;
+  color: #6b7280;
+  margin: 0 0 0.55rem;
+}
+
+/* click-to-expand abstract + view-paper link on one line (no JS:
+   native <details>; display:contents lifts summary + abstract into the
+   flex row, and order pushes the open abstract below the whole line) */
+.paper-actions {
+  margin: 0;
+  font-size: 0.95rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.paper-actions .pipe { color: #b9bec9; }
+.paper-actions details { display: contents; }
+.paper-actions summary {
+  cursor: pointer;
+  color: var(--secondary);
+  user-select: none;
+  list-style: none;              /* hide the default marker… */
+}
+.paper-actions summary::-webkit-details-marker { display: none; }
+.paper-actions summary:hover { color: var(--primary); }
+.paper-actions summary::before {
+  content: "\25B6";              /* …and draw our own ▶ */
+  display: inline-block;
+  font-size: 0.7em;
+  margin-right: 0.45em;
+  transition: transform 0.15s ease;
+}
+.paper-actions details[open] summary::before { transform: rotate(90deg); }
+.paper .abstract {
+  flex-basis: 100%;              /* full-width row of its own… */
+  order: 10;                     /* …after the actions line */
+  margin: 0.85rem 0 0;
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e6e8ee;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+.site-footer p { margin: 0 0 0.4rem; }
+
+@media (max-width: 500px) {
+  .container { padding: 2rem 1.2rem 3rem; }
+}
