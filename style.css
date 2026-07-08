@@ -143,7 +143,7 @@ h2.section-title {
 .post-body { padding: 0.95rem 0 0; }
 
 .post-date {
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 0.78rem;
   letter-spacing: 0.02em;
   color: #6b7280;
@@ -162,6 +162,7 @@ h2.section-title {
 /* Automated preview: paste the full opening text — CSS clips it to 3 lines
    and adds the ellipsis. No manual truncation needed. */
 .post-excerpt {
+  font-family: var(--mono);
   margin: 0 0 0.75rem;
   display: -webkit-box;
   -webkit-box-orient: vertical;
