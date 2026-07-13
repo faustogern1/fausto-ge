@@ -138,6 +138,7 @@ html <- '<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Digital Capabilities in the European Regions: A composite indicator of regional positioning across the digital stack</title>
 <style>
   :root {
@@ -218,7 +219,10 @@ html <- '<!DOCTYPE html>
                           line-height: 1; color: var(--ink); padding: 0;
                           font-family: inherit; }
   #zoom-controls button:hover { background: #f1efe9; }
-  svg#map.zoomed { cursor: grab; }
+  /* Touch: at base zoom vertical swipes scroll the page; once zoomed the
+     map captures gestures for panning. Mouse behaviour is unaffected. */
+  svg#map { touch-action: pan-y; }
+  svg#map.zoomed { cursor: grab; touch-action: none; }
   svg#map.panning { cursor: grabbing; }
   .widget-typ-counts { flex: 0 0 auto; }
   .widget-typ-detail, .widget-ranking {
@@ -394,6 +398,34 @@ html <- '<!DOCTYPE html>
            border-top: 1px solid var(--rule); margin-top: 4px;
            text-align: center; }
   footer a { color: var(--body); }
+
+  /* ------------------- mobile (stacked) layout ---------------------- */
+  @media (max-width: 820px) {
+    header { padding: 14px 16px 0; }
+    header h1 { font-size: 18px; }
+    header .sub { font-size: 12px; }
+    #about-btn { position: static; display: inline-block; margin-top: 10px; }
+    .layout { display: flex; flex-direction: column; align-items: stretch;
+              justify-content: flex-start; padding: 10px 14px 12px;
+              row-gap: 10px; }
+    .controls { flex-direction: column; align-items: stretch; gap: 10px;
+                padding: 0; }
+    .controls .group { flex-direction: column; align-items: stretch; gap: 4px; }
+    select, input[type="text"]#region-search {
+      width: 100%%; min-width: 0; box-sizing: border-box; }
+    #legend { align-self: stretch; margin: 0; }
+    .map-area { width: 100%%; }
+    .widget-map { width: 100%%; height: auto; aspect-ratio: 82 / 80; }
+    .side-panel { width: 100%%; height: auto; }
+    .widget-typ-detail, .widget-ranking { flex: 0 1 auto; }
+    .ranking-scroll { max-height: 55vh; }
+    .detail-scroll { max-height: 55vh; }
+    #popup { min-width: 0; max-width: calc(100vw - 20px); }
+    #about-overlay { padding: 12px; }
+    .about-card { max-height: 92vh; }
+    .about-scroll { padding: 20px 18px; }
+    footer { padding: 10px 14px 16px; }
+  }
 </style>
 </head>
 <body>
@@ -898,6 +930,42 @@ function endPan(e) {
 }
 svg.addEventListener("pointerup", endPan);
 svg.addEventListener("pointercancel", endPan);
+
+/* Touch: two-finger pinch zoom (mobile). Mouse behaviour unchanged. */
+const activePtrs = new Map();
+let pinchPrev = null;
+svg.addEventListener("pointerdown", (e) => {
+  if (e.pointerType !== "touch") return;
+  activePtrs.set(e.pointerId, e);
+  if (activePtrs.size === 2) {
+    const pts = Array.from(activePtrs.values());
+    pinchPrev = Math.hypot(pts[0].clientX - pts[1].clientX,
+                           pts[0].clientY - pts[1].clientY);
+    panState = null;                 // a pinch cancels any pan in progress
+  }
+});
+svg.addEventListener("pointermove", (e) => {
+  if (e.pointerType !== "touch" || !activePtrs.has(e.pointerId)) return;
+  activePtrs.set(e.pointerId, e);
+  if (activePtrs.size === 2 && pinchPrev) {
+    const pts = Array.from(activePtrs.values());
+    const d = Math.hypot(pts[0].clientX - pts[1].clientX,
+                         pts[0].clientY - pts[1].clientY);
+    const mid = { clientX: (pts[0].clientX + pts[1].clientX) / 2,
+                  clientY: (pts[0].clientY + pts[1].clientY) / 2 };
+    const vb = clientToVb(mid);
+    if (d > 0 && pinchPrev > 0) zoomAbout(vb[0], vb[1], d / pinchPrev);
+    pinchPrev = d;
+    suppressClick = true;
+  }
+});
+function endTouch(e) {
+  activePtrs.delete(e.pointerId);
+  if (activePtrs.size < 2) pinchPrev = null;
+  if (activePtrs.size === 0) setTimeout(() => { suppressClick = false; }, 0);
+}
+svg.addEventListener("pointerup", endTouch);
+svg.addEventListener("pointercancel", endTouch);
 
 document.getElementById("zoom-in").addEventListener("click",
   () => zoomAbout(view.x + view.w / 2, view.y + view.h / 2, 1.5));
