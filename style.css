@@ -19,6 +19,15 @@
   --mono:  "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 
+/* murmuration canvas: part of the sky, behind the cards */
+#murmuration {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+:root.dark #murmuration { display: none; }
+
 /* ---------- Dark mode: night sky with white stars ---------- */
 :root.dark {
   --primary:    #f0f1f4;
