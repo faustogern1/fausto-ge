@@ -157,7 +157,6 @@ h2.section-title {
   border: 2px solid var(--primary);   /* squared black frame */
   border-radius: 0;
   padding: 26px 26px 22px;            /* wide white mat around the picture */
-  transition: border-color 0.15s ease;
 }
 .post:hover { border-color: var(--secondary); }
 
