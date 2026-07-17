@@ -43,6 +43,7 @@
 :root.dark body::after {
   content: "";
   position: fixed;
+  z-index: -1;               /* behind the cards, part of the sky */
   top: 12%;
   left: -12%;
   width: 150px;
