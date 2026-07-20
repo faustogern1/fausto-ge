@@ -95,7 +95,7 @@
     var dt = Math.min((now - last) / 1000, 0.25);
     last = now;
     if (document.documentElement.classList.contains("dark")) return;
-    t += dt * 0.2;                            // one-fifth-speed clock
+    t += dt * 0.3;                            // 0.3x clock
     drawAll(t);
   }
 
