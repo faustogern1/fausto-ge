@@ -13,17 +13,26 @@
   document.body.prepend(canvas);
   var ctx = canvas.getContext("2d");
 
-  var DW = 1400, DH = 850, W, H, sx, sy;
+  var DW = 1400, DH = 850, W = 0, H = 0, sx, sy;
   function resize() {
+    // measure the canvas's own CSS box (sized via 100vw/100lvh) rather than
+    // the window: pinch-zoom and mobile URL-bar moves then leave it alone
+    var rect = canvas.getBoundingClientRect();
+    var w = Math.round(rect.width), h = Math.round(rect.height);
+    if (Math.abs(w - W) < 2 && Math.abs(h - H) < 2) return;   // no real change
+    W = w; H = h;
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = window.innerWidth; H = window.innerHeight;
     canvas.width = W * dpr; canvas.height = H * dpr;
-    canvas.style.width = W + "px"; canvas.style.height = H + "px";
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     sx = W / DW; sy = H / DH;
+    if (typeof t === "number") drawAll(t);   // repaint immediately after re-init
   }
   resize();
-  window.addEventListener("resize", resize);
+  var resizeTimer = null;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resize, 180);
+  });
 
   function gauss() { return (Math.random() + Math.random() + Math.random() - 1.5) * 2; }
 
