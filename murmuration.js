@@ -58,7 +58,7 @@
     homeX[i] = p[0]; homeY[i] = p[1];
     mx += p[0]; my += p[1];
     spd[i] = 0.5 + Math.random();
-    al[i]  = 0.14 + Math.random() * 0.14;    // faint: background, not foreground
+    al[i]  = 0.32 + Math.random() * 0.30;    // bold ink, still behind content
   }
   mx /= N; my /= N;
   for (i = 0; i < N; i++) {                  // center homes on origin
@@ -78,12 +78,12 @@
 
   function step(t, dt) {
     // global warp of the home shape: drift, rotation, breathing, undulation
-    var cx = DW * 0.5  + 170 * Math.sin(t * TAU / 1100 + 0.8);
-    var cy = DH * 0.45 + 110 * Math.sin(t * TAU / 1400 + 2.1);
-    var th = 0.16 * Math.sin(t * TAU / 900);
-    var sc = 1 + 0.09 * Math.sin(t * TAU / 700 + 1.3);
+    var cx = DW * 0.5  + 170 * Math.sin(t * TAU / 550 + 0.8);
+    var cy = DH * 0.45 + 110 * Math.sin(t * TAU / 700 + 2.1);
+    var th = 0.16 * Math.sin(t * TAU / 450);
+    var sc = 1 + 0.09 * Math.sin(t * TAU / 350 + 1.3);
     var ca = Math.cos(th) * sc, sa = Math.sin(th) * sc;
-    var wA = t * TAU / 300, wB = t * TAU / 360;
+    var wA = t * TAU / 150, wB = t * TAU / 180;
     for (var i = 0; i < N; i++) {
       var xr = homeX[i] * ca - homeY[i] * sa;
       var yr = homeX[i] * sa + homeY[i] * ca;
