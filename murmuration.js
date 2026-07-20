@@ -1,19 +1,19 @@
-/* Light-mode background: a murmuration.
-   Thousands of tiny dots seeded as a flock (dense knots, a sweeping band,
-   wispy arms, sparse halo). Each dot is anchored to a "home" in that shape;
-   the homes are carried through a slow global warp (drift, rotation,
-   breathing, undulation) while a local swirl field adds texture. The flock
-   morphs perpetually but never collapses or dissolves.
-   Simulation runs in a fixed 1400x850 design space, scaled to the viewport.
-   Hidden in dark mode (the night sky takes over). */
+/* Light-mode background: a murmuration, in 3D.
+   Each flock is a thin, curved sheet of tiny dots tumbling slowly in space.
+   When a sheet passes edge-on to the viewer its thousands of dots collapse
+   onto a narrow band — the stark shapes of real murmurations; face-on it
+   opens into an airy cloud. An agitation wave ripples through each sheet.
+   Three layers: a lead flock, a twin lagging 40s on the same orbit, and a
+   wide-orbit echo lagging 80s that converges with them at one extreme of
+   the swing. Simulation runs in a 1400x850 design space scaled to the
+   viewport. Hidden in dark mode (the night sky takes over). */
 (function () {
   var canvas = document.createElement("canvas");
   canvas.id = "murmuration";
   document.body.prepend(canvas);
   var ctx = canvas.getContext("2d");
 
-  var DW = 1400, DH = 850;                 // design space
-  var W, H, sx, sy;
+  var DW = 1400, DH = 850, W, H, sx, sy;
   function resize() {
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     W = window.innerWidth; H = window.innerHeight;
@@ -25,99 +25,80 @@
   resize();
   window.addEventListener("resize", resize);
 
-  // --- helpers ---
   function gauss() { return (Math.random() + Math.random() + Math.random() - 1.5) * 2; }
-  function bell()  { return Math.min(1, Math.max(0, 0.5 + (Math.random() + Math.random() - 1) * 0.5)); }
-  function bez(p0, p1, p2, p3, s) {
-    var u = 1 - s;
-    return [u*u*u*p0[0] + 3*u*u*s*p1[0] + 3*u*s*s*p2[0] + s*s*s*p3[0],
-            u*u*u*p0[1] + 3*u*u*s*p1[1] + 3*u*s*s*p2[1] + s*s*s*p3[1]];
-  }
 
-  // --- seed the flock in design space (proportions from the tuned prototype) ---
-  var N = Math.max(2500, Math.min(12000, Math.round(W * H / 125)));
-  var homeX = new Float32Array(N), homeY = new Float32Array(N);
-  var px = new Float32Array(N), py = new Float32Array(N);
-  var spd = new Float32Array(N), al = new Float32Array(N);
+  /* ---- seed: a wavy elliptical sheet with a dense knot, thin in z ---- */
+  var N = Math.max(2500, Math.min(9000, Math.round(W * H / 130)));
+  var hx = new Float32Array(N), hy = new Float32Array(N), hz = new Float32Array(N);
+  var uu = new Float32Array(N), al = new Float32Array(N), ph = new Float32Array(N);
 
-  function ribbonPoint(p0, p1, p2, p3, wmax) {
-    var s = bell();
-    var pt = bez(p0, p1, p2, p3, s);
-    var w = 8 + wmax * Math.pow(Math.sin(Math.PI * s), 1.2);
-    return [pt[0] + gauss() * w * 0.6, pt[1] + gauss() * w];
-  }
-
-  var i, p, mx = 0, my = 0;
+  var i, u, v;
   for (i = 0; i < N; i++) {
-    var u = i / N;
-    if      (u < 0.30) p = [980 + gauss() * 105, 300 + gauss() * 75];          // dense knot
-    else if (u < 0.42) p = [870 + gauss() * 70,  380 + gauss() * 50];          // secondary knot
-    else if (u < 0.76) p = ribbonPoint([180,640],[480,560],[760,470],[1010,330], 50); // band
-    else if (u < 0.92) p = ribbonPoint([330,720],[640,660],[930,590],[1150,470], 34); // arm
-    else               p = [Math.random() * DW, Math.random() * DH * 0.6];     // halo
-    homeX[i] = p[0]; homeY[i] = p[1];
-    mx += p[0]; my += p[1];
-    spd[i] = 0.5 + Math.random();
-    al[i]  = 0.32 + Math.random() * 0.30;    // bold ink, still behind content
-  }
-  mx /= N; my /= N;
-  for (i = 0; i < N; i++) {                  // center homes on origin
-    homeX[i] -= mx; homeY[i] -= my;
-    px[i] = homeX[i] + DW * 0.5; py[i] = homeY[i] + DH * 0.45;
-  }
-
-  // local swirl texture
-  function angle(x, y, t) {
-    return 1.6 * Math.sin(x * 0.0035 + t * 0.045)
-         + 1.6 * Math.cos(y * 0.0042 - t * 0.038)
-         + 1.3 * Math.sin(x * 0.0011 - y * 0.0013 + t * 0.025);
-  }
-
-  var SPEED = 0.3, KR = 0.012;               // px/s, 1/s (design units)
-  var TAU = Math.PI * 2;
-
-  function step(t, dt) {
-    // global warp of the home shape: drift, rotation, breathing, undulation
-    var cx = DW * 0.5  + 170 * Math.sin(t * TAU / 550 + 0.8);
-    var cy = DH * 0.45 + 110 * Math.sin(t * TAU / 700 + 2.1);
-    var th = 0.16 * Math.sin(t * TAU / 450);
-    var sc = 1 + 0.09 * Math.sin(t * TAU / 350 + 1.3);
-    var ca = Math.cos(th) * sc, sa = Math.sin(th) * sc;
-    var wA = t * TAU / 150, wB = t * TAU / 180;
-    for (var i = 0; i < N; i++) {
-      var xr = homeX[i] * ca - homeY[i] * sa;
-      var yr = homeX[i] * sa + homeY[i] * ca;
-      var tx = xr + 55 * Math.sin(yr * 0.004 + wA) + cx;
-      var ty = yr + 40 * Math.sin(xr * 0.003 - wB) + cy;
-      var a = angle(px[i], py[i], t);
-      px[i] += Math.cos(a) * SPEED * spd[i] * dt + (tx - px[i]) * KR * dt;
-      py[i] += Math.sin(a) * SPEED * spd[i] * dt + (ty - py[i]) * KR * dt;
+    if (i / N < 0.30) {                       // dense knot on the sheet
+      u = 0.45 + gauss() * 0.13; v = -0.10 + gauss() * 0.17;
+    } else if (i / N < 0.94) {                // body of the sheet
+      do { u = (Math.random() * 2 - 1); v = (Math.random() * 2 - 1); }
+      while (u * u + v * v > 1);
+      u = u * (0.55 + 0.45 * Math.abs(u));    // thin the middle, feather the rim
+    } else {                                  // stragglers
+      u = (Math.random() * 2 - 1) * 1.25; v = (Math.random() * 2 - 1) * 1.25;
     }
+    hx[i] = u * 430;
+    hy[i] = v * 250 * (1 - 0.25 * u * u);
+    hz[i] = 85 * Math.sin(u * 2.2) * Math.cos(v * 1.7) + gauss() * 16;  // curvature + thickness
+    uu[i] = u;
+    al[i] = 0.30 + Math.random() * 0.30;
+    ph[i] = Math.random() * 6.283;
   }
 
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
+  var TAU = Math.PI * 2, F = 1600;            // perspective distance
+
+  /* one flock layer: tumble + orbit + agitation wave, then project */
+  function drawFlock(t, bx, ax, by, ay, scMul, inkMul) {
+    var cx = bx + ax * Math.sin(t * TAU / 550 + 0.8);
+    var cy = by + ay * Math.sin(t * TAU / 700 + 2.1);
+    var thY = 1.5708 * Math.sin(t * TAU / 430 + 0.4);     // sweeps through edge-on
+    var thX = 1.35   * Math.sin(t * TAU / 610 + 1.0);
+    var cb = Math.cos(thY), sb = Math.sin(thY);
+    var ca = Math.cos(thX), sa = Math.sin(thX);
+    var wv = t * TAU / 90, wv2 = t * TAU / 110;
     ctx.fillStyle = "#0d0f12";
     for (var i = 0; i < N; i++) {
-      ctx.globalAlpha = al[i];
-      ctx.fillRect(px[i] * sx, py[i] * sy, 1, 1);
+      var z = hz[i] + 42 * Math.sin(uu[i] * 5 - wv) + 8 * Math.sin(t * TAU / 47 + ph[i]);
+      var y = hy[i] + 26 * Math.sin(uu[i] * 4 + wv2);
+      var x1 = hx[i] * cb + z * sb;
+      var z1 = -hx[i] * sb + z * cb;
+      var y2 = y * ca - z1 * sa;
+      var z2 = y * sa + z1 * ca;
+      var pr = F / (F + z2) * scMul;
+      ctx.globalAlpha = Math.min(0.85, al[i] * inkMul * pr);
+      ctx.fillRect((cx + x1 * pr) * sx, (cy + y2 * pr) * sy, 1, 1);
     }
     ctx.globalAlpha = 1;
+  }
+
+  function drawAll(t) {
+    ctx.clearRect(0, 0, W, H);
+    // wide-orbit echo, 80s behind; its orbit meets the others at the +1 extreme
+    drawFlock(t - 80, DW * 0.5 - 210, 380, DH * 0.45 - 150, 260, 1.15, 0.7);
+    // twin on the lead's orbit, 40s behind
+    drawFlock(t - 40, DW * 0.5, 170, DH * 0.45, 110, 1, 0.8);
+    // lead
+    drawFlock(t, DW * 0.5, 170, DH * 0.45, 110, 1, 1);
   }
 
   var still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var last = 0, t = 0;
   function frame(now) {
     requestAnimationFrame(frame);
-    if (now - last < 80) return;             // ~12 fps
+    if (now - last < 80) return;              // ~12 fps
     var dt = Math.min((now - last) / 1000, 0.25);
     last = now;
     if (document.documentElement.classList.contains("dark")) return;
     t += dt;
-    step(t, dt);
-    draw();
+    drawAll(t);
   }
 
-  draw();
+  drawAll(0);
   if (!still) requestAnimationFrame(frame);
 })();
