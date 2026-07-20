@@ -19,21 +19,6 @@
   --mono:  "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 
-/* murmuration canvas: part of the sky, behind the cards.
-   100lvh (large viewport) keeps it stable while mobile URL bars
-   show/hide; the JS only re-inits when this box actually changes. */
-#murmuration {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100lvh;
-  z-index: -1;
-  pointer-events: none;
-}
-:root.dark #murmuration { display: none; }
-
 /* ---------- Dark mode: night sky with white stars ---------- */
 :root.dark {
   --primary:    #f0f1f4;
@@ -50,6 +35,9 @@
   background-size: 480px 480px;
 }
 :root.dark .post-thumb { border-color: rgba(255, 255, 255, 0.25); }
+
+/* no terminal cursor in dark mode */
+:root.dark .site-tagline::after { content: none; }
 
 /* one shooting comet across the sky, 10s after the page opens (dark only) */
 :root.dark body::after {
@@ -149,6 +137,21 @@ a:hover { color: var(--primary); text-decoration: underline; text-underline-offs
   font-size: 0.9rem;
   color: var(--foreground);
   margin: 0 0 1rem;
+}
+/* the quirk: a terminal cursor that blinks a few times, then signs off */
+.site-tagline::after {
+  content: "8B";           /* ▋ */
+  margin-left: 0.15em;
+  color: var(--secondary);
+  opacity: 0;
+  animation: blinkout 4.4s steps(1) forwards;
+}
+@keyframes blinkout {
+  0%, 25%, 50%, 75%       { opacity: 1; }
+  12.5%, 37.5%, 62.5%, 87.5%, 100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-tagline::after { animation: none; opacity: 0; }
 }
 .social { display: flex; gap: 0.85rem; align-items: center; margin-left: auto; }
 .social a { color: var(--primary); display: inline-flex; }
