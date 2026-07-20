@@ -19,10 +19,16 @@
   --mono:  "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 
-/* murmuration canvas: part of the sky, behind the cards */
+/* murmuration canvas: part of the sky, behind the cards.
+   100lvh (large viewport) keeps it stable while mobile URL bars
+   show/hide; the JS only re-inits when this box actually changes. */
 #murmuration {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100lvh;
   z-index: -1;
   pointer-events: none;
 }
