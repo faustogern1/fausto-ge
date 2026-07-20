@@ -88,7 +88,7 @@
   }
 
   var still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var last = 0, t = 0;
+  var last = 0, t = 120 * 0.3;              // open at the 2-minute-view state
   function frame(now) {
     requestAnimationFrame(frame);
     if (now - last < 80) return;              // ~12 fps
@@ -99,6 +99,6 @@
     drawAll(t);
   }
 
-  drawAll(0);
+  drawAll(t);
   if (!still) requestAnimationFrame(frame);
 })();
