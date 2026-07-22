@@ -140,7 +140,7 @@ a:hover { color: var(--primary); text-decoration: underline; text-underline-offs
 }
 /* the quirk: a terminal cursor that blinks a few times, then signs off */
 .site-tagline::after {
-  content: "8B";           /* ▋ */
+  content: "\258B";           /* ▋ */
   margin-left: 0.15em;
   color: var(--secondary);
   opacity: 0;
