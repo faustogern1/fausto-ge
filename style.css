@@ -70,22 +70,17 @@
   left: 0;
   width: 64px;
   height: 32px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='32' viewBox='0 0 64 32'%3E%3Cellipse cx='32' cy='13' rx='9' ry='8' fill='%23a8cdf0'/%3E%3Cellipse cx='32' cy='20' rx='22' ry='7.5' fill='%23d3d9e6'/%3E%3Cellipse cx='32' cy='18.4' rx='22' ry='4.5' fill='%23eef2f8'/%3E%3Ccircle cx='14' cy='20.5' r='1.7' fill='%23ffd76a'/%3E%3Ccircle cx='23' cy='22.5' r='1.7' fill='%23ffd76a'/%3E%3Ccircle cx='32' cy='23.3' r='1.7' fill='%23ffd76a'/%3E%3Ccircle cx='41' cy='22.5' r='1.7' fill='%23ffd76a'/%3E%3Ccircle cx='50' cy='20.5' r='1.7' fill='%23ffd76a'/%3E%3C/svg%3E") no-repeat center / contain;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='32' viewBox='0 0 64 32'%3E%3Cellipse cx='32' cy='12' rx='9' ry='8' fill='%23000000' stroke='%23ffffff' stroke-width='2'/%3E%3Cellipse cx='32' cy='20' rx='22' ry='7' fill='%23ffffff'/%3E%3Ccircle cx='22' cy='20' r='1.6' fill='%23000000'/%3E%3Ccircle cx='32' cy='20' r='1.6' fill='%23000000'/%3E%3Ccircle cx='42' cy='20' r='1.6' fill='%23000000'/%3E%3C/svg%3E") no-repeat center / contain;
   opacity: 0;
   pointer-events: none;
-  animation: ufo 9s ease-in-out 20s 1 both;
+  animation: ufo 6s ease-in-out 20s 1 both;
 }
 @keyframes ufo {
-  0%   { transform: translate(-10vw, 30vh) rotate(0deg);   opacity: 0; }
-  5%   { opacity: 1; }
-  25%  { transform: translate(35vw, 22vh) rotate(-6deg); }  /* glide in */
-  35%  { transform: translate(40vw, 24vh) rotate(3deg); }   /* hover, bobbing */
-  45%  { transform: translate(38vw, 21vh) rotate(-3deg); }
-  55%  { transform: translate(60vw, 8vh)  rotate(8deg); }   /* sudden dart up */
-  63%  { transform: translate(55vw, 35vh) rotate(-10deg); } /* dive */
-  72%  { transform: translate(70vw, 30vh) rotate(0deg); }   /* recover */
-  80%  { transform: translate(72vw, 31vh) rotate(2deg);    opacity: 1; }
-  100% { transform: translate(115vw, 5vh) rotate(12deg);   opacity: 0; }  /* zip off */
+  /* in from the right, far and small; swells as it nears the viewer; recedes away left */
+  0%   { transform: translate(108vw, 24vh) scale(0.25) rotate(0deg);  opacity: 0; }
+  12%  { opacity: 1; }
+  50%  { transform: translate(46vw, 30vh) scale(1.7)  rotate(-3deg); opacity: 1; }
+  100% { transform: translate(-15vw, 18vh) scale(0.25) rotate(0deg); opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
