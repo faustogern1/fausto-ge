@@ -73,14 +73,47 @@
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='32' viewBox='0 0 64 32'%3E%3Cellipse cx='32' cy='12' rx='9' ry='8' fill='%23000000' stroke='%23ffffff' stroke-width='2'/%3E%3Cellipse cx='32' cy='20' rx='22' ry='7' fill='%23ffffff'/%3E%3Ccircle cx='22' cy='20' r='1.6' fill='%23000000'/%3E%3Ccircle cx='32' cy='20' r='1.6' fill='%23000000'/%3E%3Ccircle cx='42' cy='20' r='1.6' fill='%23000000'/%3E%3C/svg%3E") no-repeat center / contain;
   opacity: 0;
   pointer-events: none;
-  animation: ufo 6s ease-in-out 20s 1 both;
+  translate: 106vw 12vh;
+  rotate: 0deg;
+  scale: 0.28;
+  /* three independent channels (path / tilt / depth) make the motion organic */
+  animation: ufo-path 10s cubic-bezier(.45,.05,.55,.95) 20s 1 both,
+             ufo-tilt 10s ease-in-out 20s 1 both,
+             ufo-scale 10s ease-in-out 20s 1 both;
 }
-@keyframes ufo {
-  /* in from the right, far and small; swells as it nears the viewer; recedes away left */
-  0%   { transform: translate(108vw, 24vh) scale(0.25) rotate(0deg);  opacity: 0; }
-  12%  { opacity: 1; }
-  50%  { transform: translate(46vw, 30vh) scale(1.7)  rotate(-3deg); opacity: 1; }
-  100% { transform: translate(-15vw, 18vh) scale(0.25) rotate(0deg); opacity: 0; }
+@keyframes ufo-path {
+  0%   { translate: 106vw 12vh; opacity: 0; }
+  8%   { opacity: 1; }
+  30%  { translate: 45vw 38vh; }     /* swooping descent */
+  48%  { translate: 16vw 60vh; }     /* arrive over the landing spot */
+  56%  { translate: 14vw 65vh; }     /* settle down */
+  62%  { translate: 14.5vw 63.5vh; } /* small bounce up */
+  68%  { translate: 14vw 66vh; }     /* touchdown */
+  79%  { translate: 14vw 66vh; }     /* rest, engines off */
+  84%  { translate: 15vw 58vh; }     /* lift */
+  90%  { opacity: 1; }
+  100% { translate: 115vw 4vh; opacity: 0; }
+}
+@keyframes ufo-tilt {
+  0%   { rotate: 0deg; }
+  20%  { rotate: -9deg; }            /* banking through the descent */
+  40%  { rotate: 8deg; }             /* braking flare, nose up */
+  50%  { rotate: -5deg; }            /* rocking as it settles */
+  58%  { rotate: 4deg; }
+  64%  { rotate: -2deg; }
+  68%  { rotate: 0deg; }             /* level at touchdown */
+  79%  { rotate: 0deg; }
+  83%  { rotate: -7deg; }            /* crouch-tip before launch */
+  100% { rotate: -16deg; }           /* nose-up climb-out */
+}
+@keyframes ufo-scale {
+  0%   { scale: 0.28; }
+  30%  { scale: 0.85; }
+  48%  { scale: 1.5; }               /* closest to the viewer */
+  68%  { scale: 1.55; }
+  79%  { scale: 1.55; }
+  88%  { scale: 1.1; }
+  100% { scale: 0.3; }
 }
 
 @media (prefers-reduced-motion: reduce) {
