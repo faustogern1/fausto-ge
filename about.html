@@ -19,6 +19,13 @@
       <a href="index.html">Home</a>
       <a href="about.html" aria-current="page">About</a>
       <a href="research.html">Research</a>
+      <details class="nav-menu">
+        <summary>Projects</summary>
+        <div class="nav-dropdown">
+          <a href="https://leximap.eu">LexiMap<small>Government information and procedures across Europe</small></a>
+          <a href="eu-regions/">EU regions explorer<small>Digital capabilities in the European regions</small></a>
+        </div>
+      </details>
       <a href="https://drive.google.com/file/d/1a1qruCtXTRyG9_i2cJbVmglhtq5A1HjI/view?usp=sharing">CV</a>
       <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">&#x263E;&#xFE0E;</button>
     </nav>
@@ -64,6 +71,10 @@
   });
   sync();
 })();
+document.addEventListener("click", function (e) {
+  var m = document.querySelector(".nav-menu[open]");
+  if (m && !m.contains(e.target)) m.removeAttribute("open");
+});
 </script>
 </body>
 </html>
